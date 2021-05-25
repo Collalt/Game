@@ -21,13 +21,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.physics.box2d.World;
 import com.test.game.objects.Wall;
-import com.test.game.ListenerClass;
+//import com.test.game.ListenerClass;
 import com.test.game.objects.WindZone;
 
 
 public class GameScreen implements Screen {
 	final TestGame game;
-	private Player player;
+	public Player player;
 	private Wall wall;
 	private World world;
 	private SpriteBatch batch;
@@ -37,7 +37,7 @@ public class GameScreen implements Screen {
 	private Box2DDebugRenderer debugRenderer;
 	private InputHandler inputHandler;
 	private WindZone wind;
-	private ListenerClass listenerClass;
+	private Listener listenerClass;
 
 	static final float SCALE = 0.05f;
 	static final float STEP_TIME = 1f / 60f;
@@ -67,7 +67,7 @@ private void stepWorld() {
 		Box2D.init();
 		world = new World(new Vector2(0 ,0), true);
 
-		listenerClass = new ListenerClass();
+		listenerClass = new Listener();
 		world.setContactListener(listenerClass);
 
 
@@ -78,8 +78,9 @@ private void stepWorld() {
 		wall = new Wall(world, 0, 1080, 0, 0);
 		wall = new Wall(world, 0, 1080, 300, 0);
 
-		wind = new WindZone(world,20,20, 20,20, new Vector2(1f,0));
-		wind = new WindZone(world,20,20, 80,20, new Vector2(1f,0));
+		wind = new WindZone(world,20,20, 20,20, new Vector2(100f,0));
+		wind = new WindZone(world,20,20, 80,20, new Vector2(100f,0));
+
 
 		camera = new OrthographicCamera();
 		viewport = new ExtendViewport(100, 100, camera);
@@ -100,9 +101,6 @@ private void stepWorld() {
 		batch.setProjectionMatrix(camera.combined);
 	}
 
-	public void applyFlow(Vector2 flow){
-		player.getBody().setLinearVelocity(player.getBody().getLinearVelocity().add(flow));
-	}
 
 	@Override
 	public void render (float delta) {
@@ -113,6 +111,8 @@ private void stepWorld() {
 		camera.update();
 		inputHandler.inputHandler(player);
 		game.batch.setProjectionMatrix(camera.combined);
+
+		System.out.println(player.getForces());
 
 		//System.out.print(wind.getBody().getUserData());
 		game.batch.begin();
@@ -155,5 +155,41 @@ private void stepWorld() {
 		player.dispose();
 		world.dispose();
 		debugRenderer.dispose();
+	}
+
+
+	public class Listener implements ContactListener {
+		@Override
+		public void endContact(Contact contact) {
+			Body objectA = contact.getFixtureA().getBody();
+			Body objectB = contact.getFixtureB().getBody();
+
+			if (((ObjectInfo) objectA.getUserData()).getType() == "flow")
+				player.deleteForce((((ObjectInfo) objectA.getUserData()).getId()));
+
+			if (((ObjectInfo) objectB.getUserData()).getType() == "flow")
+				player.deleteForce((((ObjectInfo) objectB.getUserData()).getId()));		}
+
+		@Override
+		public void preSolve(Contact contact, Manifold oldManifold) {
+
+		}
+
+		@Override
+		public void postSolve(Contact contact, ContactImpulse impulse) {
+		}
+
+		@Override
+		public void beginContact(Contact contact) {
+
+			Body objectA = contact.getFixtureA().getBody();
+			Body objectB = contact.getFixtureB().getBody();
+
+			if (((ObjectInfo) objectA.getUserData()).getType() == "flow")
+				player.addForce((((ObjectInfo) objectA.getUserData()).getId()), ((FlowInfo) objectA.getUserData()).getFlow());
+
+			if (((ObjectInfo) objectB.getUserData()).getType() == "flow")
+				player.addForce((((ObjectInfo) objectB.getUserData()).getId()), ((FlowInfo) objectB.getUserData()).getFlow());
+					}
 	}
 }
