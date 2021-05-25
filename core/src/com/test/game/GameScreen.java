@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.physics.box2d.World;
+import com.test.game.objects.StreamZone;
 import com.test.game.objects.Wall;
 //import com.test.game.ListenerClass;
 import com.test.game.objects.WindZone;
@@ -37,9 +38,11 @@ public class GameScreen implements Screen {
 	private Box2DDebugRenderer debugRenderer;
 	private InputHandler inputHandler;
 	private WindZone wind;
+	private StreamZone stream;
 	private Listener listenerClass;
 
-	static final float SCALE = 0.05f;
+	public static float SCALE = 0.05f;
+
 	static final float STEP_TIME = 1f / 60f;
 	static final int VELOCITY_ITERATIONS = 6;
 	static final int POSITION_ITERATIONS = 2;
@@ -56,7 +59,6 @@ private void stepWorld() {
 
 		world.step(STEP_TIME, VELOCITY_ITERATIONS, POSITION_ITERATIONS);
 	}
-	//applyFlow(listenerClass.Test());
 }
 
 
@@ -80,6 +82,9 @@ private void stepWorld() {
 
 		wind = new WindZone(world,20,20, 20,20, new Vector2(100f,0));
 		wind = new WindZone(world,20,20, 80,20, new Vector2(100f,0));
+		stream = new StreamZone(world,10,10, 25,25, new Vector2(0,100f));
+		stream = new StreamZone(world,10,10, 200,20, new Vector2(0,100f));
+		stream = new StreamZone(world,2,2, 250,40, new Vector2(-10000000f,0f));
 
 
 		camera = new OrthographicCamera();
