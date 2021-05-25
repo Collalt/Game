@@ -7,10 +7,12 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.ArrayMap;
 import com.codeandweb.physicseditor.PhysicsShapeCache;
-import com.test.game.GameScreen;
-import com.test.game.ListenerClass;
 import com.test.game.info.ObjectInfo;
+
+
+
 
 
 public class Player {
@@ -19,6 +21,7 @@ public class Player {
     private Body body;
     PhysicsShapeCache physicsShapeCache;
     private Texture point;
+    private ArrayMap<String, Vector2> forces;
 
     public Player(World world, float x, float y, float angle) {
 
@@ -27,6 +30,7 @@ public class Player {
         texture = new Texture("ldyshko.png");
         sprite = new Sprite(texture);
         sprite.setScale(0.05f);
+        forces = new ArrayMap<String, Vector2>();
         body = physicsShapeCache.createBody("ldyshko", world, 0.05f, 0.05f);
         body.setTransform(x, y, angle);
         point = new Texture("iceberg.png");
@@ -46,19 +50,35 @@ public class Player {
         return sprite;
     }
 
+    public void addForce(String id, Vector2 force){
+        if (forces.get(id) == null) forces.put(id, force);
+    }
+
+    public void deleteForce(String id){
+        if (forces.get(id) != null) forces.removeKey(id);
+    }
+
+    public void applyForces(){
+        for (Vector2 vector : forces.values())
+        {
+            body.applyForceToCenter(vector, true);
+        }
+    }
+
     public void update(Batch batch){
+
         sprite.setPosition(body.getPosition().x, body.getPosition().y);
         sprite.setOrigin(body.getPosition().x, body.getPosition().y);
         float degrees = (float) Math.toDegrees(body.getAngle());
         sprite.setOrigin(0f,0f);
         sprite.setRotation(degrees);
         sprite.draw(batch);
-        //applyFlow();
+        applyForces();
 
     }
 
-    public void applyFlow(Vector2 flow){
-        body.setLinearVelocity(body.getLinearVelocity().add(flow));
+    public ArrayMap<String, Vector2> getForces() {
+        return forces;
     }
 
     public void dispose(){
@@ -66,9 +86,8 @@ public class Player {
     }
 
 
-    public Texture getPoint() {
-        return point;
-    }
+
+
 }
 
 
