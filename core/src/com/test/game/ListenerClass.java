@@ -42,11 +42,11 @@ public class ListenerClass implements ContactListener {
 			}*/
 
         if (((ObjectInfo) objectA.getUserData()).getType() == "flow")
-            objectB.setLinearVelocity(objectA.getLinearVelocity().add(((FlowInfo) objectA.getUserData()).getFlow()));
+            objectB.setLinearVelocity(objectB.getLinearVelocity().add(((FlowInfo) objectA.getUserData()).getFlow()));
 
 
         if (((ObjectInfo) objectB.getUserData()).getType() == "flow")
-            objectA.setLinearVelocity(objectB.getLinearVelocity().add(((FlowInfo) objectB.getUserData()).getFlow()));
+            objectA.setLinearVelocity(objectA.getLinearVelocity().add(((FlowInfo) objectB.getUserData()).getFlow()));
         //objectA.applyForceToCenter(((FlowInfo) objectB.getUserData()).getFlow(), true);
     }
 
