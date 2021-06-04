@@ -36,7 +36,6 @@ public class WindZone {
         polygonShape.setAsBox(width, height);
 
         body = world.createBody(bodyDef);
-        //((FlowBody) body).setFlow(wind);
         body.createFixture(fixtureDef);
         body.setTransform(x,y,0);
         body.setUserData(new FlowInfo("flow", wind));

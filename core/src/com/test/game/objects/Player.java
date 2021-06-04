@@ -11,8 +11,7 @@ import com.badlogic.gdx.utils.ArrayMap;
 import com.codeandweb.physicseditor.PhysicsShapeCache;
 import com.test.game.info.ObjectInfo;
 
-
-
+import static com.test.game.GameScreen.SCALE;
 
 
 public class Player {
@@ -29,9 +28,9 @@ public class Player {
 
         texture = new Texture("ldyshko.png");
         sprite = new Sprite(texture);
-        sprite.setScale(0.05f);
+        sprite.setScale(SCALE);
         forces = new ArrayMap<String, Vector2>();
-        body = physicsShapeCache.createBody("ldyshko", world, 0.05f, 0.05f);
+        body = physicsShapeCache.createBody("ldyshko", world, SCALE, SCALE);
         body.setTransform(x, y, angle);
         point = new Texture("iceberg.png");
         body.setUserData(new ObjectInfo("player"));
