@@ -24,7 +24,7 @@ public class StreamZone {
         return body;
     }
 
-    public StreamZone(World world, float width, float height, float x, float y, Vector2 wind){
+    public StreamZone(World world, float width, float height, float x, float y, Vector2 flow){
         bodyDef = new BodyDef();
         fixtureDef = new FixtureDef();
         polygonShape = new PolygonShape();
