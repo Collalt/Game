@@ -124,7 +124,7 @@ private void stepWorld() {
 
 		//ScreenUtils.clear(12f/255, 191f/255, 194f/255, 255);
 		ScreenUtils.clear(0, 0, 0, 255);
-		camera.position.set(player.getBody().getPosition().x, player.getBody().getPosition().y, 0);
+		camera.position.set(player.getBody().getPosition().x+56*SCALE, player.getBody().getPosition().y+56*SCALE, 0);
 		camera.update();
 		inputHandler.inputHandler(player, camera);
 		game.batch.setProjectionMatrix(camera.combined);
@@ -294,6 +294,13 @@ private void stepWorld() {
 
 			@Override
 			public boolean scrolled(float v, float v1) {
+
+				float zoomMax = 0.4f;
+				float zoomMin = 1f;
+				if (v1<0 && camera.zoom > zoomMax) camera.zoom+=v1*0.055f;
+				if (v1>0 && camera.zoom < zoomMin) camera.zoom+=v1*0.055f;
+				System.out.println(camera.zoom);
+
 				return false;
 			}
 
