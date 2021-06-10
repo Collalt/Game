@@ -58,7 +58,7 @@ public class GameScreen implements Screen {
 	static final float STEP_TIME = 1f / 60f;
 	static final int VELOCITY_ITERATIONS = 6;
 	static final int POSITION_ITERATIONS = 2;
-
+	public boolean DEBUG = false;
 	float accumulator = 0;
 
 private void stepWorld() {
@@ -114,7 +114,7 @@ private void stepWorld() {
 
 		stream = new StreamZone(world,300,50, 0,0, new Vector2(10f,0));
 		wind = new WindZone(world,20,20, 50,20, new Vector2(0,50f));
-		//Gdx.net.openURI("https://github.com/Collalt/Game");
+
 
 		camera = new OrthographicCamera();
 		viewport = new ExtendViewport(40, 40, camera);
@@ -175,7 +175,7 @@ private void stepWorld() {
 
 
 		game.batch.end();
-		debugRenderer.render(world, camera.combined);
+		if(DEBUG) debugRenderer.render(world, camera.combined);
 		stepWorld();
 	}
 
@@ -280,6 +280,12 @@ private void stepWorld() {
 			if (Gdx.input.isKeyPressed(Input.Keys.UP)) player.getBody().applyForceToCenter(0,60f,true);
 			if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) player.getBody().applyForceToCenter(0,-60f,true);
 
+			float accelX = Gdx.input.getAccelerometerX();
+			float accelZ = Gdx.input.getAccelerometerZ();
+
+			player.getBody().applyForceToCenter(accelX,accelZ,true);
+
+
 			float sailDeg = (float) Math.toDegrees(player.getSail().getAngle());
 
 
@@ -293,6 +299,9 @@ private void stepWorld() {
 		public class ProcessorClass implements InputProcessor {
 			@Override
 			public boolean keyDown (int keycode) {
+				if (keycode == Input.Keys.SPACE) DEBUG = !DEBUG;
+				if (keycode == Input.Keys.U) Gdx.net.openURI("https://github.com/Collalt/Game");
+
 				return false;
 			}
 
