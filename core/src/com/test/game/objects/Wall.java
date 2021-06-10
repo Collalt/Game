@@ -22,6 +22,9 @@ public class Wall {
 
         bodyDef.type = BodyDef.BodyType.StaticBody;
         fixtureDef.shape = polygonShape;
+        fixtureDef.filter.categoryBits = 0x0004;
+        fixtureDef.filter.groupIndex = 1;
+        fixtureDef.filter.maskBits = 2;
         polygonShape.setAsBox(width, height);
 
         body = world.createBody(bodyDef);
