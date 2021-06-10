@@ -41,7 +41,7 @@ public class Player {
     private Sprite penguinSprite;
     PhysicsShapeCache physicsShapeCache;
     private ArrayMap<String, Vector2> forces;
-    private Array<Sprite> penguins;
+    private Array<Penguinus> penguins;
     private static int PENGUINS_QUANTITY = 10;
 
     public Player(World world, float x, float y, float angle) {
@@ -72,7 +72,7 @@ public class Player {
         sailFd.shape = polygonShape;
         polygonShape.setAsBox(sailTexture.getWidth()/2*SCALE, sailTexture.getHeight()/2*SCALE);
         sail.createFixture(sailFd);
-        float radians = (float) Math.toRadians(90);
+        float radians = (float) Math.toRadians(-90);
         sail.setTransform(x+(56*SCALE), y+(56*SCALE), radians);
         sail.setUserData(new ObjectInfo("sail"));
 
@@ -80,18 +80,15 @@ public class Player {
         RevoluteJointDef jointDef = new RevoluteJointDef();
         jointDef.bodyA = body;
         jointDef.bodyB = sail;
-        jointDef.initialize(jointDef.bodyA, jointDef.bodyB, new Vector2(x+(56*SCALE), y+(56*SCALE)));
+        jointDef.initialize(jointDef.bodyA, jointDef.bodyB, new Vector2(sail.getWorldCenter().x-14.5f*SCALE, sail.getWorldCenter().y));
         RevoluteJoint joint = (RevoluteJoint) world.createJoint(jointDef);
 
         //FORCES ON BODY
         forces = new ArrayMap<String, Vector2>();
 
         //PENGUINS
-        penguinTexture = new Texture("pinguinus.png");
-        penguinSprite = new Sprite(penguinTexture);
-        penguinSprite.setScale(SCALE);
-        penguins = new Array<Sprite>();
-        spawnPenguin();
+        penguins = new Array<Penguinus>();
+
 
     }
 
@@ -122,16 +119,16 @@ public class Player {
         //vector.x/10 vector.y/10, s = 1, v = 10, f(i) = 2sin//(1+sin2i)
         for (Vector2 vector : forces.values())
         {
-            float i = (float) ((2 * Math.sin(Math.toRadians(sailDegrees)))/(1+Math.toRadians(2*sailDegrees)));
-            if (sailDegrees<0) sailDegrees*=(-1);
-            if (sailDegrees>180) sailDegrees-=180;
-            vector.angleDeg(new Vector2(0f,0f));
-          //  System.out.println(sailDegrees);
-            float sin = (float) Math.sin(Math.toDegrees(i));
-           // System.out.println(sin);
-            //System.out.println(Math.sin(vector.angleDeg(new Vector2(0f,0f))));
-            //System.out.println(sailDegrees);
-            body.applyForceToCenter(vector.x * sin, vector.y * sin , true);
+                        float xRad = (float) Math.toRadians(vector.angleDeg(new Vector2(0,1)));
+            float yRad = (float) Math.toRadians(vector.angleDeg(new Vector2(0,1)));
+            if(Math.toDegrees(xRad)>180) xRad = (float) (Math.toDegrees(xRad)-180f);
+            if(Math.toDegrees(yRad)>180) yRad = (float) (Math.toDegrees(xRad)-180f);
+
+
+            System.out.println(xRad);
+
+
+            body.applyForceToCenter(vector.x * (float) (Math.sin(xRad)) , vector.y*((float) (Math.cos(yRad))) , true);
         }
     }
 
@@ -143,43 +140,33 @@ public class Player {
         sprite.setOrigin(0f, 0f);
         sprite.setRotation(playerDegrees);
 
-
+        //sail.setTransform(body.getPosition().x+56*SCALE, body.getPosition().y+56*SCALE, sailDegrees);
         sailSprite.setPosition(sail.getPosition().x, sail.getPosition().y);
         sailSprite.setOriginBasedPosition(sail.getPosition().x, sail.getPosition().y);
-        sailSprite.setOrigin(sailSprite.getWidth() / 2, sailSprite.getHeight() / 2);
-        sailSprite.setRotation(sailDegrees);
+        sailSprite.setOrigin(sailSprite.getWidth() / 2, sailSprite.getHeight() / 2-14.5f*SCALE);
+        sailSprite.setRotation(sailDegrees+playerDegrees);
 
-        for (Iterator<Sprite> iter = penguins.iterator(); iter.hasNext(); ) {
-            Sprite penguin = iter.next();
-            Vector2 penguinXY = new Vector2(penguin.getX(), penguin.getY());
-            System.out.println(penguinXY);
-            if (penguin.getX()*SCALE<body.getPosition().x) penguin.setPosition(penguin.getX()+MathUtils.random(0, 1)*SCALE, penguin.getY());
+        for (Iterator<Penguinus> iter = penguins.iterator(); iter.hasNext(); ) {
+            Penguinus penguin = iter.next();
 
-            //penguin.setPosition(penguin.getX()+MathUtils.random(0, 1)*SCALE, penguin.getY());
+            penguin.getPenguinSprite().setPosition(body.getPosition().x + penguin.getOffsetX(), body.getPosition().y + penguin.getOffsetY());
+            penguin.getPenguinSprite().setOriginBasedPosition(body.getPosition().x + penguin.getOffsetX(), body.getPosition().y + penguin.getOffsetY());
+            penguin.getPenguinSprite().setOrigin(penguin.getPenguinSprite().getWidth() / 2, penguin.getPenguinSprite().getHeight() / 2);
+
+
         }
 
             sprite.draw(batch);
-            for (Sprite penguinSprite : penguins) {
-                penguinSprite.draw(batch);
+            for (Penguinus penguinus : penguins) {
+                penguinus.getPenguinSprite().draw(batch);
             }
             sailSprite.draw(batch);
 
-        while(penguins.size!=10) spawnPenguin();
+        while(penguins.size!=10) penguins.add(new Penguinus());
         applyForces();
 
     }
 
-    /*public void Iterator(Iterator<Sprite> it) {
-        Iterator<Sprite> iter = penguins.iterator();
-        while (iter.hasNext()) {
-            iter.next();
-        }
-
-        iter = penguins.iterator();
-        while (it.hasNext()) {
-            it.next();
-        }
-    }*/
 
     public ArrayMap<String, Vector2> getForces() {
         return forces;
@@ -196,24 +183,41 @@ public class Player {
     }
 
 //MathUtils.random(0, 80)*SCALE, MathUtils.random(0, 80)*SCALE
-    public void spawnPenguin(){
-        penguinTexture = new Texture("pinguinus.png");
-        penguinSprite = new Sprite(penguinTexture);
-        penguinSprite.setScale(SCALE);
 
-        penguinSprite.setPosition(body.getPosition().x+MathUtils.random(0, 80), body.getPosition().y+MathUtils.random(0, 80));
-        penguinSprite.setOrigin(penguinSprite.getWidth() / 2, penguinSprite.getHeight() / 2);
-        penguinSprite.setOriginBasedPosition(body.getPosition().x+MathUtils.random(-50, 50)*SCALE+sprite.getWidth()/2*SCALE, body.getPosition().y+MathUtils.random(-40, 40)*SCALE+sprite.getWidth()/2*SCALE);
-
-        penguins.add(penguinSprite);
-    }
 
     public class Penguinus{
         private Texture penguinTexture;
         private Sprite penguinSprite;
-        PhysicsShapeCache physicsShapeCache;
-        //public Penguinus();
+        private float offsetX;
+        private float offsetY;
 
+
+       public Penguinus(){
+            penguinTexture = new Texture("pinguinus.png");
+            penguinSprite = new Sprite(penguinTexture);
+            penguinSprite.setScale(SCALE);
+
+            offsetX = (MathUtils.random(-40, 40)+sprite.getWidth()/2)*SCALE;
+            offsetY = (MathUtils.random(-40, 40)+sprite.getHeight()/2)*SCALE;
+
+
+            penguinSprite.setPosition(body.getPosition().x, body.getPosition().y);
+            penguinSprite.setOrigin(penguinSprite.getWidth() / 2, penguinSprite.getHeight() / 2);
+            penguinSprite.setOriginBasedPosition(body.getPosition().x+offsetX, body.getPosition().y+offsetY);
+
+       }
+
+        public float getOffsetX() {
+            return offsetX;
+        }
+
+        public float getOffsetY() {
+            return offsetY;
+        }
+
+        public Sprite getPenguinSprite() {
+            return penguinSprite;
+        }
     }
 
 

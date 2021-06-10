@@ -2,6 +2,8 @@ package com.test.game;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -48,6 +50,8 @@ public class GameScreen implements Screen {
 	private StreamZone stream;
 	private Listener listenerClass;
 	private Filter filterClass;
+	private FreeTypeFontGenerator generator;
+	private BitmapFont font12;
 
 	public static float SCALE = 0.05f;
 
@@ -83,6 +87,16 @@ private void stepWorld() {
 		filterClass = new Filter();
 		world.setContactFilter(filterClass);
 
+		//FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Nathanos-Yzld8.otf"));
+		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+		generator = new FreeTypeFontGenerator(Gdx.files.internal("Nathanos-Yzld8.otf"));
+		parameter.minFilter = Texture.TextureFilter.Nearest;
+		parameter.magFilter = Texture.TextureFilter.MipMapLinearNearest;
+
+		//parameter.size = 36;
+		parameter.size = (int)Math.ceil(13);generator.scaleForPixelHeight((int)Math.ceil(24));
+		font12 = new BitmapFont();
+		font12 = generator.generateFont(parameter); // font size 12 pixels
 
 
 		player = new Player(world, 10, 10, 0);
@@ -155,9 +169,9 @@ private void stepWorld() {
 
 
 		player.update(game.batch);
-		game.font.draw(game.batch,"Vector: " + player.getBody().getLinearVelocity(), 0  , 10 );
-		game.font.draw(game.batch,"Sail Angle: " + (float) Math.toDegrees(player.getSail().getAngle()), 0,-5 );
-		game.font.draw(game.batch,"Forces: " + player.getForces(), player.getBody().getPosition().x-90, player.getBody().getPosition().y+50);
+		/*font12.draw(game.batch,"Vector: " + player.getBody().getLinearVelocity(), 0  , 10 );
+		font12.draw(game.batch,"Sail Angle: " + (float) Math.toDegrees(player.getSail().getAngle()), 0,-5 );
+		font12.draw(game.batch,"Forces: " + player.getForces(), player.getBody().getPosition().x-90, player.getBody().getPosition().y+50);*/
 
 
 		game.batch.end();
@@ -194,6 +208,7 @@ private void stepWorld() {
 		player.dispose();
 		world.dispose();
 		debugRenderer.dispose();
+		generator.dispose();
 	}
 
 
