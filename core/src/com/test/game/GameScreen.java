@@ -296,7 +296,7 @@ private void stepWorld() {
 			public boolean scrolled(float v, float v1) {
 
 				float zoomMax = 0.4f;
-				float zoomMin = 1f;
+				float zoomMin = 10f;
 				if (v1<0 && camera.zoom > zoomMax) camera.zoom+=v1*0.055f;
 				if (v1>0 && camera.zoom < zoomMin) camera.zoom+=v1*0.055f;
 				System.out.println(camera.zoom);
