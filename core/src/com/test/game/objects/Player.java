@@ -33,6 +33,8 @@ public class Player {
     private PolygonShape polygonShape;
     private Texture sailTexture;
     private Sprite sailSprite;
+    private Texture penguinTexture;
+    private Sprite penguinSprite;
     PhysicsShapeCache physicsShapeCache;
     private ArrayMap<String, Vector2> forces;
 
@@ -86,8 +88,11 @@ public class Player {
 
         RevoluteJoint joint = (RevoluteJoint) world.createJoint(jointDef);
 
-
         forces = new ArrayMap<String, Vector2>();
+
+        penguinTexture = new Texture("penguinus.png");
+        penguinSprite = new Sprite(sailTexture);
+        penguinSprite.setScale(SCALE);
 
     }
 
@@ -146,11 +151,13 @@ public class Player {
         sailSprite.setOrigin(sailSprite.getWidth()/2,sailSprite.getHeight()/2);
         sailSprite.setRotation(sailDegrees);
 
-
+        penguinSprite.setPosition(body.getPosition().x , body.getPosition().y);
+        penguinSprite.setOrigin(penguinSprite.getWidth()/2,penguinSprite.getHeight()/2);
 
 
         sprite.draw(batch);
         sailSprite.draw(batch);
+        penguinSprite.draw(batch);
 
         applyForces();
 
