@@ -2,6 +2,9 @@ package com.test.game;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2D;
@@ -85,9 +88,9 @@ private void stepWorld() {
 		player = new Player(world, 10, 10, 0);
 
 		wall = new Wall(world,1920,0, 0,0 );
-		wall = new Wall(world, 1920, 0, 0, 50);
+		//wall = new Wall(world, 1920, 0, 0, 50);
 		wall = new Wall(world, 0, 1080, 0, 0);
-		wall = new Wall(world, 0, 1080, 300, 0);
+		//wall = new Wall(world, 0, 1080, 300, 0);
 
 		/*wind = new WindZone(world,20,20, 20,20, new Vector2(100f,0));
 		wind = new WindZone(world,20,20, 80,20, new Vector2(100f,0));
@@ -107,7 +110,15 @@ private void stepWorld() {
 		batch = new SpriteBatch();
 		inputHandler = new InputHandler();
 
-		seaTexture = new Texture(Gdx.files.internal("SeaTexture.jpg"));
+		//seaTexture = new Texture(Gdx.files.internal("more.png"));
+		Pixmap pixmap512 = new Pixmap(Gdx.files.internal("more.png"));
+		Pixmap pixmap100 = new Pixmap(256, 256, pixmap512.getFormat());
+		pixmap100.drawPixmap(pixmap512,
+				0, 0, pixmap512.getWidth(), pixmap512.getHeight(),
+				0, 0, pixmap100.getWidth(), pixmap100.getHeight()
+		);
+		seaTexture = new Texture(pixmap100);
+
 
 
 	}
@@ -134,7 +145,15 @@ private void stepWorld() {
 		//System.out.print(wind.getBody().getUserData());
 		game.batch.begin();
 
-		//game.batch.draw(seaTexture, 10, 10);
+
+		Texture imgTexture = new Texture(Gdx.files.internal("more.png"));
+		imgTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+		TextureRegion imgTextureRegion = new TextureRegion(imgTexture);
+		imgTextureRegion.setRegion(0,0,imgTexture.getWidth()*3,imgTexture.getHeight()*3);
+
+		game.batch.draw(imgTextureRegion, -512, -512);
+
+
 		player.update(game.batch);
 		game.font.draw(game.batch,"Vector: " + player.getBody().getLinearVelocity(), 0  , 10 );
 		game.font.draw(game.batch,"Sail Angle: " + (float) Math.toDegrees(player.getSail().getAngle()), 0,-5 );
